@@ -1,0 +1,12 @@
+- morgan là thư viện dùng để in ra các log khi mà 1 người dùng chạy một request, có 5 chế độ, dùng như 1 middleware
+  + dev: in ra màu status code (nên bật khi phát triển)
+  + combined: tất cả thông tin người gửi request (nên bật môi trường product)
+  + common: như trên nhưng ko biết resourd
+  + short: id, thời gian phản hồi và phương thức
+  + tiny: phương thức
+
+- helmet như là 1 mũ bảo hiểm bảo vệ những thông tin riêng tư, ngăn chặn những truy cập của trang web thứ 3, dùng như 1 middleware
+
+- compression giảm thời gian request giúp truy cập nhanh hơn 
+
+-PoolSize: là tập hợp các kết nối của csdl mà có thể tái sử dụng đc duy trì bởi db, lợi ích khi dùng có thể giúp cải hiện hiệu suât, khả năng mở rộng ứng dụng
