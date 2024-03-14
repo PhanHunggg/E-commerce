@@ -1,7 +1,7 @@
 "use strict";
 
 const mongoose = require("mongoose"); // Erase if already required
-
+const slugify = require("slugify");
 const DOCUMENT_NAME = "Product";
 const COLLECTION_NAME = "Products";
 // Declare the Schema of the Mongo model
@@ -18,6 +18,9 @@ const productSchema = new mongoose.Schema(
     description: {
       type: String,
     },
+    slug: {
+      type: String,
+    },
     price: {
       type: Number,
       required: true,
@@ -31,9 +34,37 @@ const productSchema = new mongoose.Schema(
       required: true,
       enum: ["Electronics", "Clothing", "Furniture"],
     },
+    shop: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: "Shop",
+    },
     attributes: {
       type: mongoose.Schema.Types.Mixed,
       required: true,
+    },
+    ratingAverage: {
+      type: Number,
+      default: 4.5,
+      min: [1, "Rating must be above 1.0"],
+      max: [5, "Rating must be above 5.0"],
+      set: (val) => Math.round(val * 10) / 10,
+    },
+    variations: {
+      type: Array,
+      default: [],
+    },
+    isDraff: {
+      type: Boolean,
+      default: true,
+      index: true,
+      select: false,
+    },
+    isPublished: {
+      type: Boolean,
+      default: false,
+      index: true,
+      select: false,
     },
   },
   {
@@ -42,6 +73,20 @@ const productSchema = new mongoose.Schema(
   }
 );
 
+//create index search full text
+productSchema.index({ name: "text", description: "text" });
+//middleware
+productSchema.pre("save", function (next) {
+  if (typeof this.name !== "string") {
+    // Nếu this.name không phải là chuỗi, hãy chuyển đổi nó thành chuỗi
+    this.name = String(this.name);
+  }
+
+  this.slug = slugify(this.name, {
+    lower: true,
+  });
+  next();
+});
 // define the product type = clothing
 const clothingSchema = new mongoose.Schema(
   {

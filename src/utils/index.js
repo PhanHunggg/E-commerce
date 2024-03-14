@@ -7,7 +7,6 @@ const getInfoData = ({ filed = [], obj = {} }) => {
   return _.pick(obj, filed);
 };
 
-
 const generateKey = () => {
   const privateKey = crypto.randomBytes(64).toString("hex");
   const publicKey = crypto.randomBytes(64).toString("hex");
@@ -17,4 +16,8 @@ const generateKey = () => {
   };
 };
 
-module.exports = { getInfoData, generateKey };
+const getSelectData = (select = []) => {
+  return Object.fromEntries(select.map((el) => [el, 1]));
+};
+
+module.exports = { getInfoData, generateKey, getSelectData };

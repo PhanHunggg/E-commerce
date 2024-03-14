@@ -1,3 +1,4 @@
+"use strict";
 const mongoose = require("mongoose"); // Erase if already required
 
 const DOCUMENT_NAME = "ApiKey";

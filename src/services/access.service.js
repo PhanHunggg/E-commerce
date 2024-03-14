@@ -86,13 +86,11 @@ class AccessService {
     });
 
     return {
-      metaData: {
-        shop: getInfoData({
-          filed: ["_id", "name", "email"],
-          obj: foundShop,
-        }),
-        tokens,
-      },
+      shop: getInfoData({
+        filed: ["_id", "name", "email"],
+        obj: foundShop,
+      }),
+      tokens,
     };
   };
 
@@ -164,13 +162,11 @@ class AccessService {
       }
 
       return {
-        metaData: {
-          shop: getInfoData({
-            filed: ["_id", "name", "email"],
-            obj: newShop,
-          }),
-          tokens,
-        },
+        shop: getInfoData({
+          filed: ["_id", "name", "email"],
+          obj: foundShop,
+        }),
+        tokens,
       };
     }
 
