@@ -11,16 +11,17 @@ product.get(
   asyncHandler(productController.getListSearchProduct)
 );
 
-product.get(
-  "",
-  asyncHandler(productController.getAllProducts)
-);
+product.get("", asyncHandler(productController.getAllProducts));
+
+product.get("/:id", asyncHandler(productController.findProduct));
 
 //authentication
 product.use(authentication);
 ///////////////////////////
 
 product.post("", asyncHandler(productController.createNewProduct));
+
+product.patch("/:productId", asyncHandler(productController.updateProduct ));
 
 //PUT
 product.put(

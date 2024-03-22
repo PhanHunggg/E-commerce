@@ -14,7 +14,11 @@ const {
   unPublishProductByShop,
   searchProductByUser,
   findAllProducts,
+  findProduct,
+  updateProductById,
 } = require("../models/repositories/product.repo");
+const { removeNullObject, updateNestedObjParser } = require("../utils");
+const { insertInventory } = require("../models/repositories/inventory.repo");
 
 class ProductFactory {
   /**
@@ -36,12 +40,12 @@ class ProductFactory {
     return new productClass(payload).createProduct();
   }
 
-  static async updateProduct(type, payload) {
+  static async updateProduct(type, productId, payload) {
     const productClass = this.productRegister[type];
     if (!productClass)
       throw new BadRequestError(`Invalid Product Types ${type}`);
 
-    return new productClass(payload).createProduct();
+    return new productClass(payload).updateProduct(productId);
   }
 
   //PUT//
@@ -80,12 +84,12 @@ class ProductFactory {
       sort,
       page,
       filter,
-      select: ['name', 'price', 'thumb']
+      select: ["name", "price", "thumb"],
     });
   }
 
-  static async findProduct({ keySearch }) {
-    return await searchProductByUser({ keySearch });
+  static async findProduct({ id }) {
+    return await findProduct({ id, unSelect: ["__v"] });
   }
 }
 
@@ -110,8 +114,25 @@ class Product {
     this.attributes = attributes;
   }
 
-  async createProduct(product_id) {
-    return await product.create({ ...this, _id: product_id });
+  async createProduct(productId) {
+    const newProduct = await product.create({ ...this, _id: productId });
+    if (newProduct) {
+      await insertInventory({
+        productId,
+        shopId: this.shop,
+        stock: this.quantity,
+      });
+    }
+
+    return newProduct;
+  }
+
+  async updateProduct(productId, bodyUpdate) {
+    return await updateProductById({
+      productId,
+      bodyUpdate,
+      model: product,
+    });
   }
 }
 
@@ -132,6 +153,29 @@ class Clothing extends Product {
 
     return newProduct;
   }
+
+  async updateProduct(productId) {
+    /** Lọc giá trị
+     * 1 remove attributes has  null undefined
+     * 2 check xem update o cho nao
+     */
+
+    const objParams = removeNullObject(this);
+    if (objParams.attributes) {
+      // update child
+      await updateProductById({
+        productId,
+        bodyUpdate: updateNestedObjParser(objParams.attributes),
+        model: clothing,
+      });
+    }
+    //update product
+    const updateProduct = await super.updateProduct(
+      productId,
+      updateNestedObjParser(objParams)
+    );
+    return updateProduct;
+  }
 }
 
 class Electronics extends Product {
@@ -150,6 +194,29 @@ class Electronics extends Product {
 
     return newProduct;
   }
+
+  async updateProduct(productId) {
+    /** Lọc giá trị
+     * 1 remove attributes has  null undefined
+     * 2 check xem update o cho nao
+     */
+
+    const objParams = removeNullObject(this);
+    if (objParams.attributes) {
+      // update child
+      await updateProductById({
+        productId,
+        bodyUpdate: updateNestedObjParser(objParams.attributes),
+        model: electronics,
+      });
+    }
+    //update product
+    const updateProduct = await super.updateProduct(
+      productId,
+      updateNestedObjParser(objParams)
+    );
+    return updateProduct;
+  }
 }
 class Furniture extends Product {
   async createProduct() {
@@ -166,6 +233,29 @@ class Furniture extends Product {
     if (!newProduct) throw new BadRequestError("Create new Product error");
 
     return newProduct;
+  }
+
+  async updateProduct(productId) {
+    /** Lọc giá trị
+     * 1 remove attributes has  null undefined
+     * 2 check xem update o cho nao
+     */
+
+    const objParams = removeNullObject(this);
+    if (objParams.attributes) {
+      // update child
+      await updateProductById({
+        productId,
+        bodyUpdate: updateNestedObjParser(objParams.attributes),
+        model: furniture,
+      });
+    }
+    //update product
+    const updateProduct = await super.updateProduct(
+      productId,
+      updateNestedObjParser(objParams)
+    );
+    return updateProduct;
   }
 }
 

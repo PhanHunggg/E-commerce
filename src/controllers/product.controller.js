@@ -9,12 +9,26 @@ const {
 
 class ProductController {
   createNewProduct = async (req, res, next) => {
-    new SuccessResponse({
+    new CREATED({
       message: "Create new Product success",
       metaData: await ProductService.createProduct(req.body.type, {
         ...req.body,
         shop: req.user.userId,
       }),
+    }).send(res);
+  };
+
+  updateProduct = async (req, res, next) => {
+    new SuccessResponse({
+      message: "Update Product success",
+      metaData: await ProductService.updateProduct(
+        req.body.type,
+        req.params.productId,
+        {
+          ...req.body,
+          shop: req.user.userId,
+        }
+      ),
     }).send(res);
   };
 
@@ -71,6 +85,15 @@ class ProductController {
     new SuccessResponse({
       message: "Get list getAllProducts success",
       metaData: await ProductService.findAllProducts(req.query),
+    }).send(res);
+  };
+
+  findProduct = async (req, res, next) => {
+    new SuccessResponse({
+      message: "Find product success",
+      metaData: await ProductService.findProduct({
+        id: req.params.id,
+      }),
     }).send(res);
   };
 }

@@ -6,7 +6,7 @@ const {
   electronics,
   furniture,
 } = require("../../models/products.model");
-const { getSelectData } = require("../../utils");
+const { getSelectData, unGetSelectData } = require("../../utils");
 
 const findAllDraftsForShop = async ({ query, limit, skip }) => {
   return await queryProduct({ query, limit, skip });
@@ -27,6 +27,10 @@ const searchProductByUser = async ({ keySearch }) => {
     .sort({ score: { $meta: "textScore" } })
     .lean();
   return results;
+};
+
+const findProduct = async ({ id, unSelect }) => {
+  return await product.findById(id).select(unGetSelectData(unSelect));
 };
 
 const publishProductByShop = async ({ shop, productId }) => {
@@ -75,6 +79,17 @@ const findAllProducts = async ({ limit, sort, page, filter, select }) => {
   return products;
 };
 
+const updateProductById = async ({
+  productId,
+  bodyUpdate,
+  model,
+  isNew = true,
+}) => {
+  return await model.findByIdAndUpdate(productId, bodyUpdate, {
+    new: isNew,
+  });
+};
+
 const queryProduct = async ({ query, limit, skip }) => {
   return await product
     .find(query)
@@ -92,4 +107,6 @@ module.exports = {
   unPublishProductByShop,
   searchProductByUser,
   findAllProducts,
+  findProduct,
+  updateProductById
 };
