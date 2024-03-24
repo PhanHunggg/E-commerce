@@ -2,6 +2,9 @@
 
 const crypto = require("node:crypto");
 const _ = require("lodash");
+const { Types } = require("mongoose");
+
+const convertToObjIdMongo = (id) => Types.ObjectId(id);
 
 const getInfoData = ({ filed = [], obj = {} }) => {
   return _.pick(obj, filed);
@@ -40,10 +43,10 @@ const updateNestedObjParser = (obj) => {
   Object.keys(obj).forEach((key) => {
     if (typeof obj[key] === "object" && !Array.isArray(obj[key])) {
       const response = updateNestedObjParser(obj[key]);
-      console.log('[3]:: ',response)
+      console.log("[3]:: ", response);
 
       Object.keys(response).forEach((k) => {
-        console.log('[4]:: ',response[k])
+        console.log("[4]:: ", response[k]);
         final[`${key}.${k}`] = response[k];
       });
     } else {
@@ -62,4 +65,5 @@ module.exports = {
   unGetSelectData,
   removeNullObject,
   updateNestedObjParser,
+  convertToObjIdMongo
 };

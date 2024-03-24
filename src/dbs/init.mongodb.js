@@ -9,6 +9,7 @@ const {
 
 const connectString = `mongodb+srv://${host}:${pass}@${name}.20puzll.mongodb.net/?retryWrites=true&w=majority&appName=${appName}`;
 
+
 class Database {
   constructor() {
     this.connect();

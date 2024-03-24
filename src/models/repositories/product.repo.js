@@ -50,11 +50,13 @@ const publishProductByShop = async ({ shop, productId }) => {
 };
 
 const unPublishProductByShop = async ({ shop, productId }) => {
-  const foundShop = await product.findOne({
-    _id: productId,
-    shop,
-    isPublished: true,
-  });
+  const foundShop = await product
+    .findOne({
+      _id: productId,
+      shop,
+      isPublished: true,
+    })
+    .lean();
 
   if (!foundShop) return null;
 
@@ -108,5 +110,5 @@ module.exports = {
   searchProductByUser,
   findAllProducts,
   findProduct,
-  updateProductById
+  updateProductById,
 };

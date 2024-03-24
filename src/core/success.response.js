@@ -28,14 +28,12 @@ class SUCCESS extends SuccessResponse {
 
 class CREATED extends SuccessResponse {
   constructor({
-    option = {},
     message,
     statusCode = StatusCode.CREATED,
     reasonStatusCode = ReasonStatusCode.CREATED,
     metaData,
   }) {
     super({ message, statusCode, reasonStatusCode, metaData });
-    this.option = option;
   }
 }
 

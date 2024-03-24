@@ -21,6 +21,10 @@ var discountSchema = new mongoose.Schema(
       type: Number,
       required: true, // 10.000, 10%
     },
+    max_value: {
+      type: Number,
+      required: true, // 10.000, 10%
+    },
     code: {
       type: String,
       required: true,
@@ -44,6 +48,7 @@ var discountSchema = new mongoose.Schema(
       required: true,
     },
     users_used: {
+      // những used đã dùng discount
       type: Array,
       default: [],
     },
@@ -62,7 +67,7 @@ var discountSchema = new mongoose.Schema(
       ref: "Shop",
     },
     is_active: {
-        //trang thai voucher
+      //trang thai voucher
       type: Boolean,
       default: true,
     },
@@ -73,7 +78,7 @@ var discountSchema = new mongoose.Schema(
       enum: ["all", "specific"],
     },
     product_ids: {
-        // so san pham dc ap dung
+      // so san pham dc ap dung
       type: Array,
       default: [],
     },
