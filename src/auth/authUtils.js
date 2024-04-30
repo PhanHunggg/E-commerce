@@ -60,9 +60,7 @@ const authentication = asyncHandler(async (req, res, next) => {
   if (req.headers[HEADER.REFRESH_TOKEN]) {
     try {
       const refreshToken = req.headers[HEADER.REFRESH_TOKEN];
-      const decodeUser = JWT.verify(refreshToken, keyStore.privateKey);
-      if (userId !== decodeUser.userId)
-        throw new AuthFailureError("Invalid User");
+      const decodeUser = verifyJWT(refreshToken, keyStore.privateKey, userId);
 
       req.keyStore = keyStore;
       req.user = decodeUser;
@@ -78,10 +76,7 @@ const authentication = asyncHandler(async (req, res, next) => {
   if (!accessToken) throw new AuthFailureError("Invalid Request");
 
   try {
-    const decodeUser = JWT.verify(accessToken, keyStore.publicKey);
-
-    if (userId !== decodeUser.userId)
-      throw new AuthFailureError("Invalid User");
+    const decodeUser = verifyJWT(accessToken, keyStore.publicKey, userId);
 
     req.keyStore = keyStore;
     req.user = decodeUser;
@@ -92,8 +87,11 @@ const authentication = asyncHandler(async (req, res, next) => {
   }
 });
 
-const verifyJWT = async (token, keySecret) => {
-  return await JWT.verify(token, keySecret);
+const verifyJWT = (token, keySecret, userId) => {
+  const decodeUser = JWT.verify(token, keySecret);
+
+  if (userId !== decodeUser.userId) throw new AuthFailureError("Invalid User");
+  return decodeUser;
 };
 
 module.exports = { createTokenPair, authentication, verifyJWT };

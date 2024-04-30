@@ -14,6 +14,7 @@ const {
 const { RoleShop } = require("../constant");
 const { findByEmail } = require("./shop.service");
 const { Types } = require("mongoose"); // Make sure to import ObjectId
+const apiKeyModel = require("../models/apiKey.model");
 
 class AccessService {
   static handleRefreshToken = async ({ refreshToken, user, keyStore }) => {
@@ -110,27 +111,8 @@ class AccessService {
     });
 
     if (newShop) {
-      //create privateKey, publicKey
-      // cachs 1 cac cong ty lon hay sai
-      // const { publicKey, privateKey } = crypto.generateKeyPairSync("rsa", {
-      //   modulusLength: 4096,
-      //   publicKeyEncoding: {
-      //     type: "pkcs1",
-      //     format: "pem",
-      //   },
-      //   privateKeyEncoding: {
-      //     type: "pkcs1",
-      //     format: "pem",
-      //   },
-      // });
-
-      // cach 2
       const privateKey = crypto.randomBytes(64).toString("hex");
       const publicKey = crypto.randomBytes(64).toString("hex");
-
-      //public key cryptoGraphy Standards
-
-      // console.log({ publicKey, privateKey }); // save collection key store
 
       const publicKeyString = await KeyTokenService.createToken({
         userId: newShop._id,
@@ -144,8 +126,6 @@ class AccessService {
           message: "publicKeyString error",
         };
       }
-
-      // const publicKeyObj = crypto.createPublicKey(publicKeyString);
 
       //create token pair
       const tokens = await createTokenPair(
@@ -161,12 +141,19 @@ class AccessService {
         };
       }
 
+      // apiKey
+      const newKey = await apiKeyModel.create({
+        key: crypto.randomBytes(64).toString("hex"),
+        permissions: ["0000", "1111"],
+      });
+
       return {
         shop: getInfoData({
           filed: ["_id", "name", "email"],
-          obj: foundShop,
+          obj: newShop,
         }),
         tokens,
+        key: newKey.key,
       };
     }
 

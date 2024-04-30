@@ -10,3 +10,5 @@
 - compression giảm thời gian request giúp truy cập nhanh hơn 
 
 -PoolSize: là tập hợp các kết nối của csdl mà có thể tái sử dụng đc duy trì bởi db, lợi ích khi dùng có thể giúp cải hiện hiệu suât, khả năng mở rộng ứng dụng
+
+sudo service redis-server start: câu lệnh start server redis

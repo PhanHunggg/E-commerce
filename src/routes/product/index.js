@@ -4,6 +4,7 @@ const express = require("express");
 const productController = require("../../controllers/product.controller");
 const { asyncHandler } = require("../../helper/authentication");
 const { authentication } = require("../../auth/authUtils");
+const { permission } = require("../../auth/checkAuth");
 const product = express.Router();
 
 product.get(
@@ -17,7 +18,6 @@ product.get("/:id", asyncHandler(productController.findProduct));
 
 //authentication
 product.use(authentication);
-///////////////////////////
 
 product.post("", asyncHandler(productController.createNewProduct));
 

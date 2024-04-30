@@ -13,7 +13,6 @@ app.use(express.static("."));
 app.use(morgan("dev"));
 app.use(helmet());
 app.use(compression());
-
 // init db
 require("./dbs/init.mongodb");
 //init routes

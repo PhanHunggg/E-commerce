@@ -25,15 +25,18 @@ var shopSchema = new Schema(
       required: true,
     },
     status: {
+      // shop này được hoạt động hay không
       type: String,
       enum: ["active", "inactive"],
       default: "inactive",
     },
     verify: {
+      //xác minh shop đã đc đký thành công
       type: Schema.Types.Boolean,
       default: false,
     },
     roles: {
+      // shop này được phép làm gì trong hệ thống
       type: Array,
       default: [],
     },

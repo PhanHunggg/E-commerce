@@ -24,7 +24,6 @@ class Database {
       .connect(connectString)
       .then((_) => {
         console.log("Connection Mongodb success", countConnect());
-        console.log(connectString);
       })
       .catch((err) => console.log(err.message));
   }
