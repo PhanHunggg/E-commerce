@@ -9,7 +9,10 @@ const cart = require("./cart");
 const { apiKey, permission } = require("../auth/checkAuth");
 const checkout = require("./checkout");
 const inventory = require("./inventory");
+const { pushToLogDiscord } = require("../middleware");
 
+// add log to discord
+router.use(pushToLogDiscord);
 //check apiKey
 router.use(apiKey);
 //check permissions

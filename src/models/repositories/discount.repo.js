@@ -1,3 +1,4 @@
+"use strict";
 const { unGetSelectData, getSelectData } = require("../../utils");
 const discountModel = require("../discount.model");
 
