@@ -10,6 +10,7 @@ const { apiKey, permission } = require("../auth/checkAuth");
 const checkout = require("./checkout");
 const inventory = require("./inventory");
 const { pushToLogDiscord } = require("../middleware");
+const comment = require("./comment");
 
 // add log to discord
 router.use(pushToLogDiscord);
@@ -18,6 +19,7 @@ router.use(apiKey);
 //check permissions
 router.use(permission("0000"));
 
+router.use("/v1/api/comment", comment);
 router.use("/v1/api/inventory", inventory);
 router.use("/v1/api/checkout", checkout);
 router.use("/v1/api/discount", discount);
