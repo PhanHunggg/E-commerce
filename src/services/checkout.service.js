@@ -1,19 +1,9 @@
 "use strict";
 const { BadRequestError } = require("../core/error.response");
-const orderModel = require("../models/order.model");
-const {
-  findCartById,
-  updateCartToOrder,
-} = require("../models/repositories/cart.repo");
-const {
-  checkDiscountExists,
-  updateUsedDiscount,
-  updateUserUsedQuantity,
-} = require("../models/repositories/discount.repo");
+const { findCartById } = require("../models/repositories/cart.repo");
 const { checkProductByServer } = require("../models/repositories/product.repo");
-const { checkProductInCart, deleteProductsInCart } = require("./cart.service");
-const { getDiscountAmount, updateDiscountUsed } = require("./discount.service");
-const { acquireLock, releaseLock } = require("./redis.service");
+const { checkProductInCart } = require("./cart.service");
+const { getDiscountAmount } = require("./discount.service");
 
 class CheckoutService {
   /**
@@ -127,76 +117,6 @@ class CheckoutService {
       checkout_order,
     };
   }
-
-  static async orderByUser({
-    shop_order_ids,
-    cartId,
-    userId,
-    user_address = {},
-    user_payment = {},
-  }) {
-    const { shop_order_ids_new, checkout_order } = await this.checkoutReview({
-      cartId,
-      userId,
-      shop_order_ids,
-    });
-
-    //check lai 1 lan nua xem vuot ton kho hay khong
-    //get new arr productId
-    const products = shop_order_ids_new.flatMap((order) => order.item_products);
-
-    //get new arr discount
-    const discounts = shop_order_ids_new.flatMap(
-      (order) => order.shop_discounts
-    );
-    console.log("[1]: ", products);
-
-    const acquireProduct = [];
-    for (let i = 0; i < products.length; i++) {
-      const { productId, quantity } = products[i];
-      const keyLock = await acquireLock(productId, quantity, cartId);
-      console.log(keyLock);
-      acquireProduct.push(keyLock ? true : false);
-      console.log(acquireProduct);
-      if (keyLock) {
-        await releaseLock(keyLock);
-        console.log("Success del key");
-      }
-    }
-
-    // //check lai neu co 1 san pham het hang trong kho
-    if (acquireProduct.includes(false)) {
-      throw new BadRequestError(
-        "Một số sản phẩm đã được cập nhật, vui lòng quay lại giỏ hàng!"
-      );
-    }
-
-    const newOrder = await orderModel.create({
-      user: userId,
-      checkout: checkout_order,
-      shipping: user_address,
-      payment: user_payment,
-      products: shop_order_ids_new,
-    });
-
-    // neu insert thanh cong thi remove san pham trong gio hang
-    if (newOrder) {
-      // update Discount used
-      await updateDiscountUsed(discounts, userId);
-      //remove product cart
-      await deleteProductsInCart(cartId, products);
-    }
-
-    return newOrder;
-  }
-
-  static getOrdersByUser() {}
-
-  static getOneOrdersByUser() {}
-
-  static cancelOrdersByUser() {}
-
-  static updateOrderStatusByShop() {}
 }
 
 module.exports = CheckoutService;

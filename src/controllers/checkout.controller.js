@@ -10,12 +10,6 @@ class CheckoutController {
       metaData: await CheckoutService.checkoutReview(req.body),
     }).send(res);
   };
-  static orderByUser = async (req, res, next) => {
-    new CREATED({
-      message: "Create order success!",
-      metaData: await CheckoutService.orderByUser(req.body),
-    }).send(res);
-  };
 }
 
 module.exports = CheckoutController;

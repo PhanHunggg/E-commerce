@@ -8,7 +8,6 @@ const checkout = express.Router();
 
 // checkout.use(authentication);
 
-checkout.post("", asyncHandler(CheckoutController.orderByUser));
 checkout.post("/review", asyncHandler(CheckoutController.checkoutReview));
 
 module.exports = checkout;
