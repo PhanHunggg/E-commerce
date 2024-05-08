@@ -46,7 +46,42 @@ const checkDiscountExists = async (filter) => {
   return await discountModel.findOne(filter).lean();
 };
 
+const updateUsedDiscount = async ({ discountId, user }) => {
+  return await discountModel.findOneAndUpdate(
+    {
+      _id: discountId,
+    },
+    {
+      $addToSet: {
+        users_used: user,
+      },
+      $inc: {
+        max_uses: -1,
+        uses_count: 1,
+      },
+    }
+  );
+};
+
+const updateUserUsedQuantity = async ({ discountId, userId }) => {
+  return await discountModel.findOneAndUpdate(
+    {
+      _id: discountId,
+      "users_used.userId": userId,
+    },
+    {
+      $inc: {
+        max_uses: -1,
+        uses_count: 1,
+        "users_used.$.count": 1,
+      },
+    }
+  );
+};
+
 module.exports = {
+  updateUserUsedQuantity,
+  updateUsedDiscount,
   findAllDiscountCodesUnselect,
   findAllDiscountCodesSelect,
   checkDiscountExists,

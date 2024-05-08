@@ -2,6 +2,10 @@
 
 const { NotFoundError } = require("../core/error.response");
 const cartModel = require("../models/cart.model");
+const {
+  findCartById,
+  updateCartToOrder,
+} = require("../models/repositories/cart.repo");
 const { getProductById } = require("../models/repositories/product.repo");
 
 class CartService {
@@ -122,9 +126,47 @@ class CartService {
     });
   }
 
-  static getListUserCart = async ({ userId }) => {
+  static async getListUserCart({ userId }) {
     return await cartModel.findOne({ user_id: userId }).lean();
-  };
+  }
+
+  static async checkProductInCart(products, foundCart) {
+    for (let product of products) {
+      const checkProduct = foundCart.products.find(
+        (item) => item.product_id === product.productId
+      );
+
+      if (!checkProduct) throw new BadRequestError("Order wrong!!!");
+
+      if (checkProduct.quantity < product.quantity) {
+        throw new BadRequestError("Order wrong!!!");
+      }
+    }
+  }
+
+  static async deleteProductsInCart(cartId, products) {
+    const cart = await findCartById(cartId);
+
+    let productUpdate = cart.products;
+    for (let product of products) {
+      const productCart = productUpdate.find(
+        (pro) => pro.product_id === product.productId
+      );
+      if (productCart.quantity === product.quantity) {
+        productUpdate = productUpdate.filter(
+          (pro) => pro.product_id !== product.productId
+        );
+      } else {
+        const index = productUpdate.findIndex(
+          (pro) => pro.product_id === product.productId
+        );
+
+        productUpdate[index].quantity -= product.quantity;
+      }
+    }
+
+    await updateCartToOrder(cartId, productUpdate);
+  }
 }
 
 module.exports = CartService;

@@ -14,6 +14,7 @@ app.use(express.static("."));
 app.use(morgan("dev"));
 app.use(helmet());
 app.use(compression());
+app.disable("x-powered-by");
 // init db
 require("./dbs/init.mongodb");
 //init routes

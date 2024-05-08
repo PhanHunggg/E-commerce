@@ -8,6 +8,14 @@ const {
 
 const redisClient = redis.createClient();
 
+redisClient.ping((err, result) => {
+  if (err) {
+    console.error("Error connecting to Redis:", err);
+  } else {
+    console.log("Connected to Redis");
+  }
+});
+
 redisClient.on("error", function (err) {
   console.error("Error connecting to Redis:", err);
 });
@@ -16,9 +24,9 @@ const pExpire = promisify(redisClient.pexpire).bind(redisClient);
 const setNXAsync = promisify(redisClient.setnx).bind(redisClient);
 
 const acquireLock = async (productId, quantity, cartId) => {
-  console.log(productId)
+  console.log(productId);
   const key = `lock_v2024_${productId}`;
-  console.log(key)
+  console.log(key);
   const retryTimes = 10;
   const expireTime = 3000;
 
@@ -34,7 +42,6 @@ const acquireLock = async (productId, quantity, cartId) => {
           quantity,
           cartId,
         });
-
 
         if (isReservation.modifiedCount) {
           await pExpire(key, expireTime);

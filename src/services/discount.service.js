@@ -5,6 +5,8 @@ const discountModel = require("../models/discount.model");
 const {
   findAllDiscountCodesUnselect,
   checkDiscountExists,
+  updateUsedDiscount,
+  updateUserUsedQuantity,
 } = require("../models/repositories/discount.repo");
 const { findAllProducts } = require("../models/repositories/product.repo");
 const { convertToObjIdMongo } = require("../utils");
@@ -72,6 +74,7 @@ class DiscountService {
 
     return newDiscount;
   };
+
   static updateDiscount = async (discountId, bodyUpdate) => {
     const foundDiscount = await checkDiscountExists({
       _id: discountId,
@@ -167,8 +170,11 @@ class DiscountService {
       users_used,
       type,
       value,
+      applies_to,
+      product_ids,
       start_date,
-      end_date
+      end_date,
+      max_value,
     } = foundDiscount;
 
     if (!is_active) throw new BadRequestError("Discount is not active");
@@ -177,6 +183,20 @@ class DiscountService {
     // if (new Date() < new Date(start_date) || new Date() > new Date(end_date)) {
     //   throw new BadRequestError("Date code has expired");
     // }
+
+    // checkProduct specific
+    if (applies_to === "specific") {
+      let checkProduct = [];
+      for (let product of products) {
+        const pro = product_ids.find(
+          (productId) => productId === product.productId
+        );
+        checkProduct.push(pro ? true : false);
+      }
+
+      if (checkProduct.includes(false))
+        throw new BadRequestError("Sản phẩm không được áp dụng voucher!");
+    }
 
     // check xem co set gia tri toi thieu khong
     let totalOrder = 0;
@@ -194,16 +214,29 @@ class DiscountService {
     // check xem user đã dùng voucher chưa
     if (max_uses_per_user > 0) {
       const userUsedDiscount = users_used.find(
-        (user) => user.user_id === userId
+        (user) => user.userId === userId
       );
-      if (userUsedDiscount) {
+      if (userUsedDiscount && userUsedDiscount.count === max_uses_per_user) {
         throw new BadRequestError(`Discount has been used`);
       }
     }
 
     //check type discount
-
-    const amount = type === "fixed_amount" ? value : totalOrder * (value / 100);
+    let amount = 0;
+    if (type === "fixed_amount") {
+      amount = value;
+    } else {
+      if (max_value > 0) {
+        const total = totalOrder * (value / 100);
+        if (total >= max_value) {
+          amount = max_value;
+        } else {
+          amount = total;
+        }
+      } else {
+        amount = totalOrder * (value / 100);
+      }
+    }
 
     return {
       totalOrder,
@@ -243,6 +276,33 @@ class DiscountService {
     });
     return result;
   };
+
+  static async updateDiscountUsed(discounts, userId) {
+    for (let discount of discounts) {
+      const foundDiscount = await checkDiscountExists({
+        _id: discount.discountId,
+      });
+
+      const checkUserUsed = foundDiscount.users_used.find(
+        (user) => user.userId === userId
+      );
+
+      if (!checkUserUsed) {
+        await updateUsedDiscount({
+          discountId: foundDiscount._id,
+          user: {
+            userId,
+            count: 1,
+          },
+        });
+      } else {
+        await updateUserUsedQuantity({
+          discountId: foundDiscount._id,
+          userId,
+        });
+      }
+    }
+  }
 }
 
 module.exports = DiscountService;
