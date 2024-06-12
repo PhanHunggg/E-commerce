@@ -43,4 +43,17 @@ const HEADER = {
   REFRESH_TOKEN: "x-refresh-token",
 };
 
-module.exports = { StatusCode, ReasonStatusCode, RoleShop, HEADER };
+const Notification = {
+  ORDER_001: "ORDER-001",
+  ORDER_002: "ORDER-002:",
+  PROMOTION_001: "PROMOTION-001",
+  SHOP_001: "SHOP-001",
+};
+
+module.exports = {
+  StatusCode,
+  ReasonStatusCode,
+  RoleShop,
+  HEADER,
+  Notification,
+};

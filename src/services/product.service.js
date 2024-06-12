@@ -19,6 +19,8 @@ const {
 } = require("../models/repositories/product.repo");
 const { removeNullObject, updateNestedObjParser } = require("../utils");
 const { insertInventory } = require("../models/repositories/inventory.repo");
+const NotificationService = require("./notification.service");
+const { Notification } = require("../constant");
 
 class ProductFactory {
   /**
@@ -122,6 +124,18 @@ class Product {
         shopId: this.shop,
         stock: this.quantity,
       });
+      //  push noti to system
+      await NotificationService.pushNotificationToSystem({
+        type: Notification.SHOP_001,
+        receivedId: 1,
+        senderId: this.shop,
+        options: {
+          product_name: this.name,
+          shop_name: this.shop,
+        },
+      })
+        .then((res) => console.log(res))
+        .catch((err) => console.error(err));
     }
 
     return newProduct;
