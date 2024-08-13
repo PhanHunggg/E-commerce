@@ -13,6 +13,7 @@ const { pushToLogDiscord } = require("../middleware");
 const comment = require("./comment");
 const order = require("./order");
 const notification = require("./notification");
+const upload = require("./upload");
 
 // add log to discord
 router.use(pushToLogDiscord);
@@ -21,6 +22,7 @@ router.use(apiKey);
 //check permissions
 router.use(permission("0000"));
 
+router.use("/v1/api/upload", upload);
 router.use("/v1/api/notification", notification);
 router.use("/v1/api/comment", comment);
 router.use("/v1/api/inventory", inventory);
