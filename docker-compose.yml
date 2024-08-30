@@ -1,0 +1,30 @@
+version: '3'
+services:
+  redis:
+    image: redis:7.2.5
+    container_name: redis_db
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_db:/var/lib/redis/data
+    networks:
+      - shopdev-network
+
+  backend: 
+    build: .
+    container_name: backend-shopdev
+    restart: always
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    networks:
+      - shopdev-network
+
+volumes:
+  redis_db:
+    driver: local
+networks:
+  shopdev-network:
+    driver: bridge
