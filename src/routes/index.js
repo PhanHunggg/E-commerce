@@ -18,7 +18,7 @@ const upload = require("./upload");
 // add log to discord
 router.use(pushToLogDiscord);
 //check apiKey
-router.use(apiKey);
+// router.use(apiKey);
 //check permissions
 router.use(permission("0000"));
 
