@@ -20,7 +20,7 @@ router.use(pushToLogDiscord);
 //check apiKey
 // router.use(apiKey);
 //check permissions
-router.use(permission("0000"));
+// router.use(permission("0000"));
 
 router.use("/v1/api/upload", upload);
 router.use("/v1/api/notification", notification);
