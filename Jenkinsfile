@@ -12,13 +12,6 @@ pipeline {
             }
         }
 
-        stage('Copy .env file') {
-            steps {
-                sh 'cp /E-commerce/.env /var/lib/jenkins/workspace/node_project/.env'
-    }
-}
-
-
         stage('Build and Deploy') {
             steps {
                 sh '''
