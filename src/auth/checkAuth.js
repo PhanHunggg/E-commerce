@@ -1,7 +1,7 @@
 "use strict";
 
 const { HEADER } = require("../constant");
-const { findById } = require("../services/apiKey.service");
+const { findByKey } = require("../services/apiKey.service");
 
 const apiKey = async (req, res, next) => {
   try {
@@ -15,7 +15,7 @@ const apiKey = async (req, res, next) => {
 
     // check objkey
 
-    const objKey = await findById(key);
+    const objKey = await findByKey(key);
 
     if (!objKey) {
       return res.status(403).json({

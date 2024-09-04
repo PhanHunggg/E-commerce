@@ -27,7 +27,7 @@ class AccessService {
     if (foundRefreshToken) {
       await KeyTokenService.deleteById(userId);
 
-      throw new ForbiddenError("Something weird happened!! Please relogin");
+      throw new ForbiddenError("Something weird happened!! Please re-login");
     }
 
     if (keyStore.refreshToken !== refreshToken) {
@@ -110,52 +110,55 @@ class AccessService {
       roles: [RoleShop.SHOP],
     });
 
-    if (newShop) {
-      const privateKey = crypto.randomBytes(64).toString("hex");
-      const publicKey = crypto.randomBytes(64).toString("hex");
+    if (!newShop) {
+      throw new BadRequestError("Error: Shop cannot be created!");
+    }
 
-      const publicKeyString = await KeyTokenService.createToken({
-        userId: newShop._id,
-        publicKey,
-        privateKey,
-      });
 
-      if (!publicKeyString) {
-        return {
-          code: "xxx",
-          message: "publicKeyString error",
-        };
-      }
+    const privateKey = crypto.randomBytes(64).toString("hex");
+    const publicKey = crypto.randomBytes(64).toString("hex");
 
-      //create token pair
-      const tokens = await createTokenPair(
-        { userId: newShop._id, email },
-        publicKey,
-        privateKey
-      );
+    const publicKeyString = await KeyTokenService.createToken({
+      userId: newShop._id,
+      publicKey,
+      privateKey,
+    });
 
-      if (!tokens) {
-        return {
-          code: 400,
-          message: "token error",
-        };
-      }
-
-      // apiKey
-      const newKey = await apiKeyModel.create({
-        key: crypto.randomBytes(64).toString("hex"),
-        permissions: ["0000", "1111"],
-      });
-
+    if (!publicKeyString) {
       return {
-        shop: getInfoData({
-          filed: ["_id", "name", "email"],
-          obj: newShop,
-        }),
-        tokens,
-        key: newKey.key,
+        code: 400,
+        message: "publicKeyString error",
       };
     }
+
+    //create token pair
+    const tokens = await createTokenPair(
+      { userId: newShop._id, email },
+      publicKey,
+      privateKey
+    );
+
+    if (!tokens) {
+      return {
+        code: 400,
+        message: "Token generation error",
+      };
+    }
+
+    // apiKey
+    const newKey = await apiKeyModel.create({
+      key: crypto.randomBytes(64).toString("hex"),
+      permissions: ["0000", "1111"],
+    });
+
+    return {
+      shop: getInfoData({
+        filed: ["_id", "name", "email"],
+        obj: newShop,
+      }),
+      tokens,
+      key: newKey.key,
+    };
 
     return {
       code: 200,

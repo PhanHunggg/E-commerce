@@ -39,9 +39,6 @@ class DiscountService {
       throw new BadRequestError("Start date must be before end date");
     }
 
-    // if (new Date() < new Date(start_date) || new Date() > new Date(end_date)) {
-    //   throw new BadRequestError("Date code has expired");
-    // }
 
     const foundDiscount = await checkDiscountExists({
       code,
